@@ -1,15 +1,22 @@
 // app/layout.tsx
-// Next.js App Router のルートレイアウト（必須）
+import './globals.css';
 
 export const metadata = {
-  title: '東洋占術アプリ',
-  description: '算命学・四柱推命・易学による統合鑑定',
+  title: '東洋占術アプリ — 算命学・四柱推命・易学',
+  description: '生年月日と性別から、東洋三大占術による統合鑑定をお届けします',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {/* 星空背景 */}
+        <div className="starfield" aria-hidden="true">
+          <div className="layer" />
+        </div>
+        <div className="shooting-star" aria-hidden="true" />
+        {children}
+      </body>
     </html>
   );
 }

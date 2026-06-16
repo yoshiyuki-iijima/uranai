@@ -31,8 +31,12 @@ interface FortuneResponse {
   };
 }
 
+const currentYear = new Date().getFullYear();
+
 export default function Home() {
-  const [date, setDate] = useState('1990-01-01');
+  const [year, setYear] = useState('1990');
+  const [month, setMonth] = useState('1');
+  const [day, setDay] = useState('1');
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [result, setResult] = useState<FortuneResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -41,18 +45,27 @@ export default function Home() {
   const onSubmit = async () => {
     setLoading(true);
     setError(null);
+    setResult(null);
     try {
-      const [y, m, d] = date.split('-').map(Number);
       const res = await fetch('/api/fortune', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ birthYear: y, birthMonth: m, birthDay: d, gender }),
+        body: JSON.stringify({
+          birthYear: Number(year),
+          birthMonth: Number(month),
+          birthDay: Number(day),
+          gender,
+        }),
       });
       if (!res.ok) {
         const j = await res.json();
         throw new Error(j.error ?? 'request failed');
       }
       setResult(await res.json());
+      // 結果へスムーズスクロール
+      setTimeout(() => {
+        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'unknown error');
     } finally {
@@ -60,43 +73,108 @@ export default function Home() {
     }
   };
 
+  const numeric = (v: string) => v.replace(/[^\d]/g, '');
+
   return (
-    <main style={{ maxWidth: 720, margin: '40px auto', padding: 16, fontFamily: 'sans-serif' }}>
-      <h1>東洋占術アプリ</h1>
-      <p>算命学・四柱推命・易学による統合鑑定</p>
+    <main className="container">
+      <header className="hero">
+        <h1 className="hero-title">星々が語る、あなたの軌跡</h1>
+        <p className="hero-subtitle">Sanmeigaku ・ Shichu-Suimei ・ Ekigaku</p>
+      </header>
 
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center', margin: '20px 0' }}>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          min="1900-01-01"
-          max="2100-12-31"
-        />
-        <select value={gender} onChange={(e) => setGender(e.target.value as 'male' | 'female')}>
-          <option value="male">男性</option>
-          <option value="female">女性</option>
-        </select>
-        <button onClick={onSubmit} disabled={loading}>
-          {loading ? '計算中…' : '鑑定する'}
+      <section className="card form-card">
+        <div className="form-row">
+          <label className="form-label">生年月日</label>
+          <div className="date-inputs">
+            <input
+              className="date-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="1990"
+              value={year}
+              onChange={(e) => setYear(numeric(e.target.value).slice(0, 4))}
+              maxLength={4}
+              aria-label="年"
+            />
+            <input
+              className="date-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="月"
+              value={month}
+              onChange={(e) => setMonth(numeric(e.target.value).slice(0, 2))}
+              maxLength={2}
+              aria-label="月"
+            />
+            <input
+              className="date-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="日"
+              value={day}
+              onChange={(e) => setDay(numeric(e.target.value).slice(0, 2))}
+              maxLength={2}
+              aria-label="日"
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <label className="form-label">性別</label>
+          <div className="gender-toggle">
+            <button
+              type="button"
+              className={`gender-option ${gender === 'male' ? 'active' : ''}`}
+              onClick={() => setGender('male')}
+            >
+              男性
+            </button>
+            <button
+              type="button"
+              className={`gender-option ${gender === 'female' ? 'active' : ''}`}
+              onClick={() => setGender('female')}
+            >
+              女性
+            </button>
+          </div>
+        </div>
+
+        <button className="divine-button" onClick={onSubmit} disabled={loading}>
+          {loading ? (
+            <span className="divine-button-loading">
+              <span className="spinner" />
+              読み解いています
+            </span>
+          ) : (
+            '鑑定する'
+          )}
         </button>
-      </div>
 
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
+        {error && <p className="error-msg">⚠ {error}</p>}
+      </section>
 
       {result && (
-        <section style={{ display: 'grid', gap: 24 }}>
-          <Card title="統合リーディング">
-            <p><strong>本質：</strong>{result.synthesis.coreTraits.join('・')}</p>
-            <p>{result.synthesis.elementProfile}</p>
-            <p><strong>今のテーマ：</strong>{result.synthesis.currentTheme}</p>
-            <p>{result.synthesis.suggestion}</p>
-          </Card>
+        <section id="results" className="results">
+          <div className="result-card result-card-synthesis">
+            <p className="result-title">統合リーディング</p>
+            <p className="synthesis-traits">{result.synthesis.coreTraits.join(' ・ ')}</p>
+            <p className="result-text">{result.synthesis.elementProfile}</p>
+            <p className="result-text">
+              <strong>今のテーマ</strong>　{result.synthesis.currentTheme}
+            </p>
+            <p className="result-text">{result.synthesis.suggestion}</p>
+          </div>
 
-          <Card title="四柱推命">
-            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <div className="result-card">
+            <p className="result-title">四柱推命</p>
+            <table className="pillar-table">
               <thead>
-                <tr><th>柱</th><th>干支</th><th>通変星</th><th>十二運</th></tr>
+                <tr>
+                  <th>柱</th>
+                  <th>干支</th>
+                  <th>通変星</th>
+                  <th>十二運</th>
+                </tr>
               </thead>
               <tbody>
                 {result.shichusuimei.pillars.map((p) => (
@@ -109,38 +187,80 @@ export default function Home() {
                 ))}
               </tbody>
             </table>
-            <p>日主：{result.shichusuimei.dayMaster.stem}（{result.shichusuimei.dayMaster.element}・{result.shichusuimei.dayMaster.yin}）</p>
-            <p>主気五行：{result.shichusuimei.dominantElement} / 不足：{result.shichusuimei.lackingElements.join('、') || 'なし'}</p>
-            <p>大運：{result.shichusuimei.daiunDirection}</p>
-          </Card>
+            <div className="meta-row">
+              <span className="meta-label">日主</span>
+              <span className="meta-value">
+                {result.shichusuimei.dayMaster.stem}（{result.shichusuimei.dayMaster.element}・{result.shichusuimei.dayMaster.yin}）
+              </span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">主気五行</span>
+              <span className="meta-value">{result.shichusuimei.dominantElement}</span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">不足五行</span>
+              <span className="meta-value">
+                {result.shichusuimei.lackingElements.join('、') || 'なし'}
+              </span>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">大運の流れ</span>
+              <span className="meta-value">{result.shichusuimei.daiunDirection}</span>
+            </div>
+          </div>
 
-          <Card title="算命学（人体図）">
-            <p>北方星（年柱・親縁）：{result.sanmeigaku.jintaiZu.north}</p>
-            <p>中央星（本質）：<strong>{result.sanmeigaku.jintaiZu.center}</strong></p>
-            <p>南方星（月柱・社会）：{result.sanmeigaku.jintaiZu.south}</p>
-            <p>陰陽配置：{result.sanmeigaku.genderAxis}</p>
-          </Card>
+          <div className="result-card">
+            <p className="result-title">算命学 ・ 人体図</p>
+            <div className="jintai-grid">
+              <div className="jintai-star">
+                <p className="jintai-position">北 — 親縁・過去</p>
+                <p className="jintai-name">{result.sanmeigaku.jintaiZu.north}</p>
+              </div>
+              <div className="jintai-star jintai-star-center">
+                <p className="jintai-position">中央 — 本質</p>
+                <p className="jintai-name">{result.sanmeigaku.jintaiZu.center}</p>
+              </div>
+              <div className="jintai-star">
+                <p className="jintai-position">南 — 社会・仕事</p>
+                <p className="jintai-name">{result.sanmeigaku.jintaiZu.south}</p>
+              </div>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">陰陽配置</span>
+              <span className="meta-value">{result.sanmeigaku.genderAxis}</span>
+            </div>
+          </div>
 
-          <Card title="易学">
-            <p style={{ fontSize: 32 }}>
-              {result.ekigaku.upper.symbol}<br />
-              {result.ekigaku.lower.symbol}
-            </p>
-            <p><strong>{result.ekigaku.hexagramName}</strong></p>
-            <p>動爻：第{result.ekigaku.movingLine}爻（{result.ekigaku.movingLineHint}）</p>
-            <p>キーワード：{result.ekigaku.keywords.join('・')}</p>
-          </Card>
+          <div className="result-card">
+            <p className="result-title">易学</p>
+            <div className="hexagram">
+              <div className="hexagram-symbol">
+                {result.ekigaku.upper.symbol}
+                <br />
+                {result.ekigaku.lower.symbol}
+              </div>
+              <div className="hexagram-info">
+                <p className="hexagram-name">{result.ekigaku.hexagramName}</p>
+                <p className="hexagram-trigrams">
+                  上卦：{result.ekigaku.upper.name}（{result.ekigaku.upper.element}）　
+                  下卦：{result.ekigaku.lower.name}（{result.ekigaku.lower.element}）
+                </p>
+                <div className="hexagram-keywords">
+                  {result.ekigaku.keywords.map((k) => (
+                    <span key={k} className="keyword-tag">{k}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="meta-row">
+              <span className="meta-label">動爻</span>
+              <span className="meta-value">
+                第{result.ekigaku.movingLine}爻 — {result.ekigaku.movingLineHint}
+              </span>
+            </div>
+          </div>
         </section>
       )}
     </main>
-  );
-}
-
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: 16 }}>
-      <h2 style={{ marginTop: 0 }}>{title}</h2>
-      {children}
-    </div>
   );
 }

@@ -1,0 +1,556 @@
+/* app/globals.css
+ * 夜空テーマのグローバルスタイル
+ * カラー：深紫の夜空 + パープルアクセント + ゴールド差し色
+ */
+
+:root {
+  --bg-deep: #06030f;
+  --bg-mid: #15093a;
+  --bg-accent: #2b1158;
+
+  --purple: #a855f7;
+  --purple-glow: #c084fc;
+  --purple-soft: rgba(168, 85, 247, 0.18);
+
+  --gold: #fbbf24;
+  --gold-glow: #fde68a;
+  --gold-soft: rgba(251, 191, 36, 0.14);
+
+  --text: #f5f3ff;
+  --text-soft: #d4ccf0;
+  --text-dim: #9b91c4;
+
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-border-hover: rgba(192, 132, 252, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic',
+    'Segoe UI', Helvetica, Arial, sans-serif;
+  font-feature-settings: 'palt';
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse at 20% 0%, var(--bg-accent) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, #3a1968 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 100%);
+  background-attachment: fixed;
+}
+
+/* ===== 星空レイヤー =====
+ * box-shadow を多重に使って多数の星を一度に描画
+ */
+.starfield {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.starfield::before,
+.starfield::after,
+.starfield .layer {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* 小さい星（多数・速い瞬き） */
+.starfield::before {
+  box-shadow:
+    47vw 12vh 0 0 #fff, 13vw 87vh 0 0 #fff, 78vw 34vh 0 0 #fff,
+    22vw 56vh 0 0 #fff, 91vw 71vh 0 0 #fff, 5vw 23vh 0 0 #fff,
+    63vw 8vh 0 0 #fff, 38vw 92vh 0 0 #fff, 71vw 45vh 0 0 #fff,
+    18vw 67vh 0 0 #fff, 84vw 19vh 0 0 #fff, 51vw 78vh 0 0 #fff,
+    29vw 4vh 0 0 #fff, 96vw 53vh 0 0 #fff, 8vw 41vh 0 0 #fff,
+    66vw 26vh 0 0 #fff, 42vw 63vh 0 0 #fff, 75vw 89vh 0 0 #fff,
+    15vw 14vh 0 0 #fff, 58vw 38vh 0 0 #fff, 33vw 73vh 0 0 #fff,
+    87vw 6vh 0 0 #fff, 11vw 51vh 0 0 #fff, 69vw 18vh 0 0 #fff,
+    44vw 95vh 0 0 #fff, 82vw 62vh 0 0 #fff, 25vw 31vh 0 0 #fff,
+    54vw 47vh 0 0 #fff, 36vw 84vh 0 0 #fff, 93vw 28vh 0 0 #fff,
+    7vw 76vh 0 0 #fff, 61vw 15vh 0 0 #fff, 19vw 39vh 0 0 #fff,
+    77vw 58vh 0 0 #fff, 49vw 22vh 0 0 #fff, 31vw 81vh 0 0 #fff,
+    85vw 44vh 0 0 #fff, 14vw 9vh 0 0 #fff, 67vw 66vh 0 0 #fff,
+    40vw 35vh 0 0 #fff;
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+/* 中サイズの星（ゴールド寄り・ゆっくり瞬き） */
+.starfield::after {
+  box-shadow:
+    23vw 18vh 0 0 var(--gold-glow), 71vw 73vh 0 0 var(--gold-glow),
+    45vw 41vh 0 0 var(--gold-glow), 88vw 9vh 0 0 var(--gold-glow),
+    12vw 64vh 0 0 var(--gold-glow), 56vw 27vh 0 0 var(--gold-glow),
+    34vw 88vh 0 0 var(--gold-glow), 79vw 52vh 0 0 var(--gold-glow),
+    6vw 35vh 0 0 var(--gold-glow), 62vw 79vh 0 0 var(--gold-glow),
+    91vw 46vh 0 0 var(--gold-glow), 17vw 11vh 0 0 var(--gold-glow),
+    48vw 68vh 0 0 var(--gold-glow), 84vw 24vh 0 0 var(--gold-glow);
+  width: 2px;
+  height: 2px;
+  animation: twinkle 6s ease-in-out infinite 1s;
+}
+
+/* 大きい星（パープル・特にゆっくり） */
+.starfield .layer {
+  box-shadow:
+    35vw 22vh 0 0 var(--purple-glow), 72vw 56vh 0 0 var(--purple-glow),
+    18vw 78vh 0 0 var(--purple-glow), 81vw 14vh 0 0 var(--purple-glow),
+    52vw 47vh 0 0 var(--purple-glow), 9vw 31vh 0 0 var(--purple-glow),
+    64vw 83vh 0 0 var(--purple-glow);
+  width: 3px;
+  height: 3px;
+  filter: blur(0.5px);
+  animation: twinkle 8s ease-in-out infinite 2s;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* 流れ星 */
+.shooting-star {
+  position: fixed;
+  top: 10%;
+  left: -10%;
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  z-index: 0;
+  pointer-events: none;
+  animation: shoot 9s linear infinite;
+  opacity: 0;
+}
+
+@keyframes shoot {
+  0% { transform: translate(0, 0) rotate(15deg); opacity: 0; }
+  3% { opacity: 1; }
+  10% { opacity: 0; }
+  100% { transform: translate(120vw, 60vh) rotate(15deg); opacity: 0; }
+}
+
+/* ===== レイアウト ===== */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+}
+
+/* ===== ヒーロー ===== */
+.hero {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.hero-title {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  background: linear-gradient(135deg, var(--gold-glow) 0%, var(--purple-glow) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+
+.hero-subtitle {
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* ===== カード共通 ===== */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 32px;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover {
+  border-color: var(--card-border-hover);
+}
+
+/* ===== 入力フォーム ===== */
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-label {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* 日付入力グループ（年・月・日を独立に） */
+.date-inputs {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 10px;
+}
+
+.date-input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  font-size: 17px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.date-input:focus {
+  border-color: var(--purple);
+  background: rgba(168, 85, 247, 0.08);
+}
+
+.date-input::placeholder {
+  color: var(--text-dim);
+}
+
+/* 性別トグル */
+.gender-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--card-border);
+}
+
+.gender-option {
+  padding: 14px 12px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.gender-option:hover {
+  color: var(--text);
+}
+
+.gender-option.active {
+  background: linear-gradient(135deg, var(--purple) 0%, #7e22ce 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px var(--purple-soft);
+}
+
+/* 鑑定ボタン */
+.divine-button {
+  margin-top: 8px;
+  padding: 18px 32px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--gold) 0%, #d97706 100%);
+  color: #1a0a2e;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+}
+
+.divine-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(251, 191, 36, 0.35);
+}
+
+.divine-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.divine-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.divine-button-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(26, 10, 46, 0.3);
+  border-top-color: #1a0a2e;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-msg {
+  margin-top: 12px;
+  color: #f87171;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+
+/* ===== 結果セクション ===== */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 48px;
+  animation: fadeUp 0.6s ease-out;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.result-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 32px;
+}
+
+.result-card-synthesis {
+  background: linear-gradient(135deg,
+    rgba(168, 85, 247, 0.12) 0%,
+    rgba(251, 191, 36, 0.08) 100%);
+  border: 1px solid rgba(192, 132, 252, 0.25);
+}
+
+.result-title {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.synthesis-traits {
+  font-size: 26px;
+  font-weight: 300;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--gold-glow), var(--purple-glow));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.05em;
+}
+
+.result-text {
+  color: var(--text-soft);
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.result-text + .result-text {
+  margin-top: 12px;
+}
+
+.result-text strong {
+  color: var(--gold-glow);
+  font-weight: 500;
+}
+
+/* テーブル */
+.pillar-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.pillar-table th,
+.pillar-table td {
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--card-border);
+  font-size: 14px;
+}
+
+.pillar-table th {
+  color: var(--text-dim);
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.pillar-table td {
+  color: var(--text-soft);
+}
+
+.pillar-table td:nth-child(2) {
+  color: var(--gold-glow);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid var(--card-border);
+  font-size: 14px;
+}
+
+.meta-row:first-child {
+  border-top: none;
+}
+
+.meta-label {
+  color: var(--text-dim);
+}
+
+.meta-value {
+  color: var(--text);
+}
+
+/* 人体図 */
+.jintai-grid {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  justify-items: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.jintai-star {
+  text-align: center;
+  padding: 14px 24px;
+  background: rgba(168, 85, 247, 0.06);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  min-width: 200px;
+}
+
+.jintai-star-center {
+  background: linear-gradient(135deg,
+    rgba(168, 85, 247, 0.18),
+    rgba(251, 191, 36, 0.12));
+  border-color: var(--gold-soft);
+  transform: scale(1.05);
+}
+
+.jintai-position {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.jintai-name {
+  font-size: 20px;
+  color: var(--purple-glow);
+  letter-spacing: 0.1em;
+}
+
+.jintai-star-center .jintai-name {
+  color: var(--gold-glow);
+  font-size: 24px;
+}
+
+/* 易卦 */
+.hexagram {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 0;
+}
+
+.hexagram-symbol {
+  font-size: 56px;
+  line-height: 1.1;
+  color: var(--gold-glow);
+  text-shadow: 0 0 20px var(--gold-soft);
+  letter-spacing: -0.05em;
+}
+
+.hexagram-info {
+  flex: 1;
+}
+
+.hexagram-name {
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.hexagram-trigrams {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+  letter-spacing: 0.1em;
+}
+
+.hexagram-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.keyword-tag {
+  padding: 4px 12px;
+  background: var(--purple-soft);
+  border: 1px solid rgba(192, 132, 252, 0.25);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--purple-glow);
+  letter-spacing: 0.05em;
+}
+
+/* レスポンシブ */
+@media (max-width: 600px) {
+  .container { padding: 40px 16px 80px; }
+  .card, .result-card { padding: 24px; border-radius: 16px; }
+  .hexagram { flex-direction: column; text-align: center; gap: 16px; }
+  .jintai-star { min-width: 160px; }
+}
